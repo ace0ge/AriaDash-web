@@ -63,29 +63,31 @@ export function useAria2(config: Aria2Config) {
   const addUri = useCallback(async (uri: string, options?: Record<string, unknown>) => {
     const client = clientRef.current
     if (!client) return
-    await client.addUri([uri], options)
+    try { await client.addUri([uri], options) } catch {}
     await fetchAll(client)
   }, [fetchAll])
 
   const pause = useCallback(async (gid: string) => {
     const client = clientRef.current
     if (!client) return
-    await client.pause(gid)
+    try { await client.pause(gid) } catch {}
     await fetchAll(client)
   }, [fetchAll])
 
   const unpause = useCallback(async (gid: string) => {
     const client = clientRef.current
     if (!client) return
-    await client.unpause(gid)
+    try { await client.unpause(gid) } catch {}
     await fetchAll(client)
   }, [fetchAll])
 
   const remove = useCallback(async (gid: string, force?: boolean) => {
     const client = clientRef.current
     if (!client) return
-    if (force) await client.forceRemove(gid)
-    else await client.remove(gid)
+    try {
+      if (force) await client.forceRemove(gid)
+      else await client.remove(gid)
+    } catch {}
     await fetchAll(client)
   }, [fetchAll])
 

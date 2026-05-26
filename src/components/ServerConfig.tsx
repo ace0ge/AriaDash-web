@@ -72,7 +72,7 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-400">协议</label>
             <div className="grid grid-cols-2 gap-2">
-              {([{ v: 'ws', l: 'ws://' }, { v: 'wss', l: 'wss://' }, { v: 'http', l: 'http://' }, { v: 'https', l: 'https://' }] as const).map(({ v, l }) => (
+              {([{ v: 'wss', l: 'wss://' }, { v: 'https', l: 'https://' }] as const).map(({ v, l }) => (
                 <button
                   key={v}
                   onClick={() => setProtocol(v)}
@@ -86,11 +86,7 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
                 </button>
               ))}
             </div>
-            <p className="text-[11px] text-slate-600">
-              {protocol.startsWith('wss') || protocol.startsWith('https')
-                ? '🔒 加密连接（推荐）'
-                : '⚠️ 非加密连接'}
-            </p>
+            <p className="text-[11px] text-slate-500">🔒 加密连接</p>
           </div>
         </div>
       </div>

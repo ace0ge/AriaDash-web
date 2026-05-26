@@ -1,4 +1,4 @@
-import type { Aria2Config, Aria2Protocol, DownloadTask, GlobalStat, RpcNotification, RpcResponse } from './types'
+import type { Aria2Config, DownloadTask, GlobalStat, RpcNotification, RpcResponse } from './types'
 
 type PendingEntry = {
   resolve: (value: unknown) => void
@@ -14,16 +14,9 @@ export class Aria2Client {
 
   constructor(private config: Aria2Config) {}
 
-  private static SCHEMES: Record<Aria2Protocol, string> = {
-    ws: 'ws',
-    wss: 'wss',
-    http: 'http',
-    https: 'https',
-  }
-
   private get baseUrl(): string {
     const { host, port, protocol } = this.config
-    const scheme = Aria2Client.SCHEMES[protocol]
+    const scheme = protocol === 'wss' ? 'wss' : 'https'
     return `${scheme}://${host}:${port}/jsonrpc`
   }
 
@@ -32,7 +25,7 @@ export class Aria2Client {
   }
 
   async connect(): Promise<void> {
-    if (this.config.protocol === 'ws' || this.config.protocol === 'wss') {
+    if (this.config.protocol === 'wss') {
       await this.connectWebSocket()
     }
   }
@@ -93,8 +86,7 @@ export class Aria2Client {
   }
 
   private async call<T>(method: string, ...params: unknown[]): Promise<T> {
-    const isWs = this.config.protocol === 'ws' || this.config.protocol === 'wss'
-    if (isWs && this.ws && this.connected) {
+    if (this.config.protocol === 'wss' && this.ws && this.connected) {
       return this.callWs<T>(method, params)
     }
     return this.callHttp<T>(method, params)
