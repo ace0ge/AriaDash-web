@@ -94,7 +94,7 @@ export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: Downl
           </button>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 pb-24">
+      <div className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-2 pb-24">
         <div className="flex flex-col gap-2">
           {filtered.map((task, idx) => (
             <div key={task.gid} className="flex items-start gap-1">
@@ -115,7 +115,7 @@ export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: Downl
                   </button>
                 </div>
               )}
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <DownloadItem
                   task={task}
                   batchMode={batchMode}

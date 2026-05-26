@@ -77,7 +77,7 @@ export function DownloadItem({
   const showRightAction = revealed === 'left'
 
   return (
-    <div className="relative overflow-hidden rounded-xl">
+    <div className="relative rounded-xl" style={{ clipPath: 'inset(0 round 12px)' }}>
       {!batchMode && (
         <button
           onClick={() => { onRemove(task.gid); closeReveal() }}
