@@ -69,7 +69,7 @@ export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: Downl
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="flex flex-1 flex-col overflow-x-hidden">
       <div className="flex gap-1 overflow-x-auto px-2 pb-2 scrollbar-none">
         {TABS.map((tab) => (
           <button
@@ -94,7 +94,7 @@ export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: Downl
           </button>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto px-2 pb-24">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 pb-24">
         <div className="flex flex-col gap-2">
           {filtered.map((task, idx) => (
             <div key={task.gid} className="flex items-start gap-1">

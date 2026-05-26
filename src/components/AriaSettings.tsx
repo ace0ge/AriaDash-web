@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Settings, Save } from 'lucide-react'
 import { useAria2Context } from '../context/Aria2Context'
+import { useI18n } from '../i18n'
 
 type OptionKey = 'max-concurrent-downloads' | 'max-overall-download-limit' | 'max-overall-upload-limit' | 'max-connection-per-server' | 'continue'
 
-const FIELDS: { key: OptionKey; label: string; type: 'number' | 'bool' }[] = [
-  { key: 'max-concurrent-downloads', label: '最大并行下载数', type: 'number' },
-  { key: 'max-overall-download-limit', label: '全局下载限速 (B/s)', type: 'number' },
-  { key: 'max-overall-upload-limit', label: '全局上传限速 (B/s)', type: 'number' },
-  { key: 'max-connection-per-server', label: '单服务器连接数', type: 'number' },
-  { key: 'continue', label: '续传', type: 'bool' },
+const FIELDS: { key: OptionKey; labelKey: string; type: 'number' | 'bool' }[] = [
+  { key: 'max-concurrent-downloads', labelKey: 'settings.concurrentDownloads', type: 'number' },
+  { key: 'max-overall-download-limit', labelKey: 'settings.downloadLimit', type: 'number' },
+  { key: 'max-overall-upload-limit', labelKey: 'settings.uploadLimit', type: 'number' },
+  { key: 'max-connection-per-server', labelKey: 'settings.connectionsPerServer', type: 'number' },
+  { key: 'continue', labelKey: 'settings.continue', type: 'bool' },
 ]
 
 export function AriaSettings() {
   const { getGlobalOption, changeGlobalOption } = useAria2Context()
+  const { t } = useI18n()
   const [values, setValues] = useState<Record<string, string>>({})
   const [loaded, setLoaded] = useState(false)
 
@@ -36,12 +38,12 @@ export function AriaSettings() {
     <div className="rounded-xl bg-slate-900 p-4">
       <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-slate-500">
         <Settings className="h-4 w-4" />
-        aria2 全局参数
+        {t('settings.ariaTitle')}
       </h3>
       <div className="mt-3 space-y-3">
-        {FIELDS.map(({ key, label, type }) => (
+        {FIELDS.map(({ key, labelKey, type }) => (
           <div key={key}>
-            <label className="mb-1 block text-xs text-slate-400">{label}</label>
+            <label className="mb-1 block text-xs text-slate-400">{t(labelKey)}</label>
             {type === 'bool' ? (
               <button
                 onClick={() => setValues((v) => ({ ...v, [key]: v[key] === 'true' ? 'false' : 'true' }))}
@@ -67,7 +69,7 @@ export function AriaSettings() {
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-500 py-2.5 text-sm font-medium text-white active:bg-blue-600"
       >
         <Save className="h-4 w-4" />
-        保存参数
+        {t('settings.ariaSave')}
       </button>
     </div>
   )
