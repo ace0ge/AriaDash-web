@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, File, Globe, Link, Users, Wifi, CheckSquare } from 'lucide-react'
 import { useAria2Context } from '../context/Aria2Context'
-import type { DownloadTask, PeerInfo, ServerInfo } from '../api/types'
+import type { DownloadTask } from '../api/types'
 import { ProgressBar } from '../components/ProgressBar'
 import { StatusBadge } from '../components/StatusBadge'
 import { TaskActions } from '../components/TaskActions'
@@ -51,14 +51,11 @@ function etaStr(total: string, completed: string, speed: string): string {
 export function TaskDetail() {
   const { gid } = useParams<{ gid: string }>()
   const navigate = useNavigate()
-  const { tasks, connected, pause, unpause, remove, getTaskDetail, getPeers, getServers, changeTaskOption } = useAria2Context()
+  const { tasks, connected, pause, unpause, remove, getTaskDetail, changeTaskOption } = useAria2Context()
   const { t } = useI18n()
   const task = tasks.find((t) => t.gid === gid)
 
   const [detail, setDetail] = useState<DownloadTask | null>(null)
-  const [peers, setPeers] = useState<PeerInfo[]>([])
-  const [servers, setServers] = useState<ServerInfo[]>([])
-  const [loading, setLoading] = useState(false)
 
   const { revealed, handlers, closeReveal } = useSwipe({
     edgeOnly: true,
@@ -67,17 +64,10 @@ export function TaskDetail() {
 
   useEffect(() => {
     if (!gid || !task) return
-    setLoading(true)
-    Promise.all([
-      getTaskDetail(gid),
-      getPeers(gid),
-      getServers(gid),
-    ]).then(([d, p, s]) => {
+    getTaskDetail(gid).then((d) => {
       if (d) setDetail(d)
-      setPeers(p)
-      setServers(s)
-    }).finally(() => setLoading(false))
-  }, [gid, task, getTaskDetail, getPeers, getServers])
+    })
+  }, [gid, task, getTaskDetail])
 
   useEffect(() => {
     if (revealed === 'right') {
@@ -98,8 +88,6 @@ export function TaskDetail() {
   const current = detail ?? task
   const pct = percent(current.totalLength, current.completedLength)
   const name = fileName(current)
-  const hasPeers = peers.length > 0
-  const hasServers = servers.length > 0
   const isBt = !!current.bittorrent
 
   const [btSelected, setBtSelected] = useState<Set<string>>(
@@ -228,65 +216,6 @@ export function TaskDetail() {
             <CheckSquare className="h-3.5 w-3.5" />
             {t('detail.applySelection')}
           </button>
-        )}
-      </CollapsibleSection>
-
-      <CollapsibleSection title={t('detail.blocks')} icon={<Globe className="h-4 w-4" />}>
-        {loading ? (
-          <p className="text-sm text-slate-500">{t('detail.loading')}</p>
-        ) : current.numPieces ? (
-          <div className="mb-3 space-y-1 text-sm">
-            <DetailRow label={t('detail.totalPieces')} value={current.numPieces} />
-            <DetailRow label={t('detail.pieceSize')} value={formatSize(Number(current.pieceLength ?? '0'))} />
-            {current.verifiedLength && Number(current.verifiedLength) > 0 && (
-              <DetailRow label={t('detail.verified')} value={formatSize(Number(current.verifiedLength))} />
-            )}
-          </div>
-        ) : null}
-        {hasPeers && (
-          <div>
-            <p className="mb-2 text-xs font-medium text-slate-500">{t('detail.peers')}</p>
-            <div className="space-y-2">
-              {peers.map((p, i) => (
-                <div key={i} className="rounded-lg bg-slate-950 p-2 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">{p.ip}:{p.port}</span>
-                    <span className={`${p.seeder === 'true' ? 'text-green-400' : 'text-blue-400'}`}>
-                      {p.seeder === 'true' ? t('detail.seeding') : t('detail.downloading')}
-                    </span>
-                  </div>
-                  <div className="mt-1 flex gap-4 text-slate-500">
-                    <span>↓{formatSpeed(p.downloadSpeed)}</span>
-                    <span>↑{formatSpeed(p.uploadSpeed)}</span>
-                    <span>{p.amChoking === 'true' ? t('detail.choked') : t('detail.unchoked')}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        {hasServers && (
-          <div>
-            <p className="mb-2 text-xs font-medium text-slate-500">{t('detail.servers')}</p>
-            <div className="space-y-2">
-              {servers.map((s) => (
-                <div key={s.index}>
-                  <p className="text-xs text-slate-600">{t('detail.files')} #{s.index}</p>
-                  <div className="mt-1 space-y-1">
-                    {s.servers.map((sv, j) => (
-                      <div key={j} className="rounded-lg bg-slate-950 p-2 text-xs">
-                        <div className="truncate text-slate-300">{sv.uri}</div>
-                        <div className="mt-0.5 text-slate-500">↓{formatSpeed(sv.downloadSpeed)}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        {!hasPeers && !hasServers && !current.numPieces && (
-          <p className="text-sm text-slate-500">{t('detail.noPeers')}</p>
         )}
       </CollapsibleSection>
     </div>

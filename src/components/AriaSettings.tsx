@@ -5,6 +5,8 @@ import { useI18n } from '../i18n'
 
 type OptionKey = 'max-concurrent-downloads' | 'max-overall-download-limit' | 'max-overall-upload-limit' | 'max-connection-per-server' | 'continue'
 
+const KB_KEYS = new Set(['max-overall-download-limit', 'max-overall-upload-limit'])
+
 const FIELDS: { key: OptionKey; labelKey: string; type: 'number' | 'bool' }[] = [
   { key: 'max-concurrent-downloads', labelKey: 'settings.concurrentDownloads', type: 'number' },
   { key: 'max-overall-download-limit', labelKey: 'settings.downloadLimit', type: 'number' },
@@ -12,6 +14,24 @@ const FIELDS: { key: OptionKey; labelKey: string; type: 'number' | 'bool' }[] = 
   { key: 'max-connection-per-server', labelKey: 'settings.connectionsPerServer', type: 'number' },
   { key: 'continue', labelKey: 'settings.continue', type: 'bool' },
 ]
+
+function bToKb(v: Record<string, string>, keys: Set<string>): Record<string, string> {
+  const r: Record<string, string> = {}
+  for (const k of Object.keys(v)) {
+    const val = v[k] ?? '0'
+    r[k] = keys.has(k) ? String(Math.round(Number(val) / 1024)) : val
+  }
+  return r
+}
+
+function kbToB(v: Record<string, string>, keys: Set<string>): Record<string, string> {
+  const r: Record<string, string> = {}
+  for (const k of Object.keys(v)) {
+    const val = v[k] ?? '0'
+    r[k] = keys.has(k) ? String(Number(val) * 1024) : val
+  }
+  return r
+}
 
 export function AriaSettings() {
   const { getGlobalOption, changeGlobalOption } = useAria2Context()
@@ -22,14 +42,14 @@ export function AriaSettings() {
   useEffect(() => {
     getGlobalOption().then((opt) => {
       if (opt) {
-        setValues(opt)
+        setValues(bToKb(opt, KB_KEYS))
         setLoaded(true)
       }
     })
   }, [getGlobalOption])
 
   const handleSave = () => {
-    changeGlobalOption(values)
+    changeGlobalOption(kbToB(values, KB_KEYS))
   }
 
   if (!loaded) return null

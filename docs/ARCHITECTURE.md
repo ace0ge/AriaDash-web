@@ -151,6 +151,8 @@ AriaDash-web/
 │   ├── favicon.svg
 │   ├── robots.txt
 │   └── icons/                # PWA 图标 (含 iOS 各尺寸)
+├── scripts/
+│   └── generate-icons.mjs    # PWA 图标生成 (乌云+闪电，纯 Node)
 ├── src/
 │   ├── api/
 │   │   ├── types.ts          # ★ 全部 TypeScript 类型定义
@@ -158,26 +160,29 @@ AriaDash-web/
 │   ├── components/           # UI 组件
 │   ├── hooks/                # React Hooks
 │   ├── context/              # React Context
+│   ├── i18n/                 # 国际化 (zh.ts + en.ts + I18nProvider)
 │   ├── pages/                # 路由页面
 │   ├── App.tsx               # 根组件 + 路由
 │   ├── main.tsx              # 入口
 │   └── index.css             # Tailwind 入口
-├── .github/workflows/        # CI/CD
-│   ├── deploy.yml
-│   └── ci.yml
+├── .github/workflows/
+│   └── deploy.yml            # CI/CD 单 job 构建部署
 ├── index.html
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
-└── postcss.config.js
+├── postcss.config.js
+└── AGENTS.md                 # AI 编码约定 (gitignored)
 ```
 
 ## 6. GitHub Pages 部署
 
 - 构建命令: `npm run build`
 - 输出目录: `dist/`
-- GitHub Actions: 监听 `main` 分支推送，构建后推送到 `gh-pages` 分支
+- GitHub Actions: 监听 `main` 分支推送，单 job 顺序执行 `checkout → setup-node → npm ci → npm run build → actions/upload-pages-artifact@v3 → actions/deploy-pages@v4`
 - `vite.config.ts` 中设置 `base: '/AriaDash-web/'`
+- Pages source: "GitHub Actions"
+- 构建产物: ~265KB，gzip ~79KB
 
 ## 7. 兼容性
 

@@ -4,40 +4,40 @@
 
 ```
 <App>
-  <Aria2Provider>                          ← Context Provider (连接状态 + 操作方法)
-    <BrowserRouter>
-      <Layout>                             ← 全局布局 (顶栏 + Sheet + 主内容)
-        ├─ <Header />                      ← 顶栏: 标题 + 批量选择入口 + 设置 + 连接指示灯
-        │
-        ├─ <Routes>
-        │   ├─ Route "/" → <Home />        ← 主页
-        │   │              ├─ <Dashboard />      ← 仪表盘 (速度卡片 + 统计)
-        │   │              └─ <DownloadList>     ← 下载列表 (含多选状态)
-        │   │                   ├─ <StatusTabs />     ← 状态筛选 tabs
-        │   │                   ├─ <DownloadItem />   ← 单个任务卡片 (map, 无按钮)
-        │   │                   │    ├─ <ProgressBar />   ← 进度条
-        │   │                   │    └─ <StatusBadge />   ← 状态标签
-        │   │                   │    (手势: useSwipe hook)
-        │   │                   └─ <BatchActionBar />  ← 底部批量操作栏 (多选模式)
-        │   │
-        │   ├─ Route "/task/:gid" → <TaskDetail />  ← 任务详情页
-        │   │                       ├─ 详情信息 (文件大小/速度/ETA)
-        │   │                       ├─ <TaskActions /> ← 操作按钮 (仅详情页)
-        │   │                       ├─ <CollapsibleSection /> ← 连接状态 (WebSocket+任务连接数)
-        │   │                       ├─ <CollapsibleSection /> ← 文件列表 (每文件进度条+源数)
-        │   │                       ├─ <CollapsibleSection /> ← 区块信息 (Peer/Server列表)
-        │   │                       └─ (右滑返回: useSwipe edgeOnly)
-        │   │
-        │   └─ Route "/settings" → <Settings />    ← 设置页
-        │                        └─ <ServerConfig />   ← 服务器配置表单
-        │
-        ├─ <AddDownloadSheet />            ← 底部弹出 Sheet (Portal)
-        │   ├─ <AddUrlForm />              ← URL / Magnet 输入
-        │   └─ <TorrentUpload />           ← 种子文件上传
-        │
-        └─ <BottomNav />                   ← 底部 Tab 导航
-    </BrowserRouter>
-  </Aria2Provider>
+  <I18nProvider>
+    <Aria2Provider>                          ← Context Provider (连接状态 + 操作方法)
+      <HashRouter>
+        <Layout>                             ← 全局布局 (h-dvh + max-w-[430px] + mx-auto)
+          <Routes>
+            ├─ Route "/" → <Home />          ← 主页
+            │              ├─ <Header />           ← 顶栏: 标题 + 批量选择入口 + 设置导航
+            │              ├─ <Dashboard />        ← 仪表盘 (下载/上传速度 + 活跃数)
+            │              └─ <DownloadList>       ← 下载列表 (筛选 tabs + 任务卡片 + 多选栏)
+            │                   ├─ <DownloadItem />   ← 单个任务卡片 (滑动手势: useSwipe, clip-path 裁剪)
+            │                   │    ├─ <ProgressBar />   ← 进度条
+            │                   │    └─ <StatusBadge />   ← 状态图标
+            │                   └─ <BatchActionBar />  ← 底部批量操作栏 (多选模式)
+            │
+            ├─ Route "/task/:gid" → <TaskDetail />  ← 任务详情页
+            │                       ├─ 进度/速度/ETA + 操作按钮
+            │                       ├─ <CollapsibleSection /> ← 连接状态 (WebSocket + 任务连接数/做种)
+            │                       ├─ <CollapsibleSection /> ← 文件列表 (每文件进度+复选框+源数)
+            │                       ├─ <CollapsibleSection /> ← 区块信息 (Peer/Server 列表)
+            │                       └─ (右滑返回: useSwipe edgeOnly)
+            │
+            └─ Route "/settings" → <Settings />    ← 设置页
+                                 ├─ <ServerConfig />    ← 服务器配置 (地址/端口/Secret/协议)
+                                 ├─ <AriaSettings />    ← aria2 全局参数 (并发/限速/续传)
+                                 ├─ 版本信息展示
+                                 └─ 语言切换器
+          </Routes>
+          <AddDownloadSheet />            ← 底部弹出 Sheet (URL / Torrent 标签页切换)
+              ├─ URL 标签页 → URL 输入表单
+              └─ Torrent 标签页 → <TorrentUpload />
+        </Layout>
+      </HashRouter>
+    </Aria2Provider>
+  </I18nProvider>
 </App>
 ```
 
@@ -47,35 +47,35 @@
 
 | 组件 | 路径 | 职责 | Props |
 |------|------|------|-------|
-| `Home` | `src/pages/Home.tsx` | 组合 Dashboard + DownloadList | 无（从 Context 读取） |
-| `TaskDetail` | `src/pages/TaskDetail.tsx` | 单任务详情 + 操作按钮 + 右滑返回 + 三个 CollapsibleSection (连接状态/文件列表/区块信息) | 无（从 URL param 取 gid） |
-| `Settings` | `src/pages/Settings.tsx` | 组合 ServerConfig + 主题/关于 | 无 |
+| `Home` | `src/pages/Home.tsx` | 组合 Dashboard + DownloadList + 欢迎页/连接中/错误态 | 无（从 Context 读取） |
+| `TaskDetail` | `src/pages/TaskDetail.tsx` | 单任务详情 + 操作按钮 + 右滑返回 + 3 个 CollapsibleSection (连接/文件/区块) + BT 文件选择 | 无（从 URL param 取 gid） |
+| `Settings` | `src/pages/Settings.tsx` | 组合 ServerConfig + AriaSettings + 版本信息 + 语言切换器 | 无 |
 
 ### 2.2 布局组件
 
 | 组件 | 路径 | 职责 | Props |
 |------|------|------|-------|
-| `Layout` | `src/components/Layout.tsx` | 顶栏 + 内容区 + Sheet + TabBar | `children` |
-| `Header` | `src/components/Header.tsx` | 标题、批量选择入口、设置导航、连接指示灯 | `{ onToggleBatch? }` |
+| `Layout` | `src/components/Layout.tsx` | h-dvh + max-w-[430px] + mx-auto 固定视口布局 | `children` |
+| `Header` | `src/components/Header.tsx` | 标题、批量选择入口（☑/× 切换）、设置导航 | `{ batchMode, selectedCount, onToggleBatch }` |
 | `BottomNav` | `src/components/BottomNav.tsx` | 主页 / 统计 Tab 切换 | 无 |
 
 ### 2.3 业务组件
 
 | 组件 | 路径 | 职责 | Props |
 |------|------|------|-------|
-| `Dashboard` | `src/components/Dashboard.tsx` | 全局下载/上传速度、统计 | `{ globalStat: GlobalStat }` |
-| `DownloadList` | `src/components/DownloadList.tsx` | 状态 tabs + 任务列表 + 多选模式管理 | `{ batchMode, onSelect }` |
-| `DownloadItem` | `src/components/DownloadItem.tsx` | 单个任务卡片（无按钮，手势驱动） | `{ task: DownloadTask; batchMode?; selected?; onSelect? }` |
+| `Dashboard` | `src/components/Dashboard.tsx` | 下载/上传速度 + 活跃数（3 卡片网格） | `{ globalStat: GlobalStat }` |
+| `DownloadList` | `src/components/DownloadList.tsx` | 状态筛选 tabs + 任务列表 + 多选模式 + 等待队列排序 + 清除已完成 | `{ batchMode, onBatchModeChange, onAddClick }` |
+| `DownloadItem` | `src/components/DownloadItem.tsx` | 单个任务卡片（滑动手势 + clip-path 裁剪，无按钮） | `{ task, batchMode?, selected?, onSelect?, onPause, onUnpause, onRemove }` |
 | `ProgressBar` | `src/components/ProgressBar.tsx` | 进度条 | `{ percent: number }` |
-| `StatusBadge` | `src/components/StatusBadge.tsx` | 状态文字标签 | `{ status: TaskStatus }` |
-| `TaskActions` | `src/components/TaskActions.tsx` | 暂停/恢复/删除按钮（仅详情页使用） | `{ task: DownloadTask }` |
-| `BatchActionBar` | `src/components/BatchActionBar.tsx` | 底部批量操作栏 | `{ selected: Set<string>; onBatchPause; onBatchResume; onBatchRemove }` |
-| `AddDownloadSheet` | `src/components/AddDownloadSheet.tsx` | 底部 Sheet 容器 | `{ open: boolean; onClose }` |
-| `AddUrlForm` | `src/components/AddUrlForm.tsx` | URL / Magnet 输入表单 | `{ onSubmit: (urls: string[], opts) => void }` |
-| `TorrentUpload` | `src/components/TorrentUpload.tsx` | 种子文件选择 + 上传 | `{ onSubmit: (file: File, opts) => void }` |
-| `ServerConfig` | `src/components/ServerConfig.tsx` | RPC 配置输入 + 连接测试 | 无（读写 useConfig + useAria2） |
-| `SpeedChart` | `src/components/SpeedChart.tsx` | 速度折线图 | `{ data: SpeedPoint[] }` |
-| `CollapsibleSection` | `src/components/CollapsibleSection.tsx` | 可折叠区块（点击标题展开/收起，grid 动画） | `{ title, icon, children, defaultOpen? }` |
+| `StatusBadge` | `src/components/StatusBadge.tsx` | 状态图标（无文字） | `{ status: TaskStatus }` |
+| `TaskActions` | `src/components/TaskActions.tsx` | 暂停/恢复/删除按钮（仅详情页） | `{ task, onPause, onUnpause, onRemove }` |
+| `BatchActionBar` | `src/components/BatchActionBar.tsx` | 底部批量操作栏（暂停/恢复/删除） | `{ selectedCount, hasActive, hasPaused, onBatchPause, onBatchUnpause, onBatchRemove }` |
+| `AddDownloadSheet` | `src/components/AddDownloadSheet.tsx` | 底部 Sheet（URL / Torrent 标签页切换） | `{ open, onClose }` |
+| `AddUrlForm` | `src/components/AddUrlForm.tsx` | URL / Magnet 输入表单 | `{ onSubmit }` |
+| `TorrentUpload` | `src/components/TorrentUpload.tsx` | .torrent 文件选择 + base64 编码 + 上传 | `{ onClose }` |
+| `ServerConfig` | `src/components/ServerConfig.tsx` | RPC 配置表单（地址/端口/Secret/wss/https）+ 连接测试 | `{ config, onSave }` |
+| `AriaSettings` | `src/components/AriaSettings.tsx` | aria2 全局参数（并发/限速/连接数/续传） | 无（从 Context 读取） |
+| `CollapsibleSection` | `src/components/CollapsibleSection.tsx` | 可折叠区块（grid-rows 动画） | `{ title, icon, children, defaultOpen? }` |
 
 ## 3. 数据流向
 
@@ -116,8 +116,9 @@ useConfig ───> Aria2Provider ───> useAria2 ───> Aria2Client
 
 | Hook | 路径 | 职责 | 返回值 |
 |------|------|------|--------|
-| `useSwipe` | `src/hooks/useSwipe.ts` | 触摸手势检测（左滑/右滑/点击） | `{ isSwiping, direction, translateX, handlers, reset }` |
+| `useSwipe` | `src/hooks/useSwipe.ts` | 触摸手势检测（左滑/右滑/点击） | `{ isSwiping, direction, translateX, revealed, handlers, closeReveal }` |
 | | | 支持 `edgeOnly` 参数（详情页右滑返回） | |
+| | | swipe 容器使用 `clip-path: inset(0)` 而非 `overflow:hidden`（Safari transform 兼容） | |
 
 ### Context 接口
 

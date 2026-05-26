@@ -69,3 +69,62 @@
 - 抉择: iOS 原生风格右滑边缘返回 + 左上角 ← 返回按钮
 - 理由: 符合 iPhone 用户的操作预期，useSwipe hook 复用，仅需 edgeOnly 参数做边缘限制
 - 影响: useSwipe 需支持 edgeOnly 模式，TaskDetail 页面需注入 swipe 动画（手指跟随位移 + 回弹）
+
+---
+
+## 2026-05-26 (后续迭代)
+
+### [Tier 1] aria2 全局参数设置 / 任务排序 / 清除已完成
+
+**全局参数设置表单 (AriaSettings)**
+- 背景: 用户需要修改 max-concurrent-downloads 等全局参数
+- 抉择: 全新 AriaSettings 组件嵌入 Settings 页面，读取/写入 getGlobalOption/changeGlobalOption
+- 理由: 无需新页面，复用 Settings 已有的滚动布局
+- 影响: Aria2Client 新增 getGlobalOption / changeGlobalOption 方法，Context 暴露
+
+**任务排序 (↑↓ 按钮)**
+- 背景: 等待队列的任务需要调整顺序
+- 抉择: 在等待筛选标签页的任务卡片左侧添加 ↑↓ 按钮
+- 理由: 语义清晰，逐位调整精确控制；changePosition RPC 支持 POS_CUR 偏移
+- 影响: DownloadList 需区分筛选标签，仅 waiting 标签显示排序按钮
+
+**清除已完成任务**
+- 背景: 完成/已删除的任务仍显示在列表中
+- 抉择: 在"完成"筛选标签旁添加"清除已完成"按钮，调用 purgeDownloadResult
+- 影响: 新增 purgeDownloadResult RPC 方法
+
+**种子文件上传 (TorrentUpload)**
+- 背景: 需要支持 .torrent 文件添加下载
+- 抉择: AddDownloadSheet 新增"种子文件"标签页，切换 URL / Torrent 输入方式
+- 理由: addTorrent 需要 base64 编码文件内容，与 addUri 参数不同，需独立表单
+- 影响: 新增 TorrentUpload 组件，AddDownloadSheet 改成标签页切换，Aria2Client 新增 addTorrent 方法
+
+**BT 文件选择**
+- 背景: 种子文件中可选择性下载部分文件
+- 抉择: 在文件列表折叠区（paused/waiting 状态）显示复选框，选择后点击"应用文件选择"按钮
+- 理由: aria2 的 select-file 参数需要在开始前设置，限定暂停/等待状态
+- 影响: TaskDetail 文件列表增加复选框逻辑 + changeOption RPC
+
+### [i18n] 国际化支持
+
+**自定义 i18n 系统**
+- 背景: 需要中英文双语，但 react-intl 等库体积大
+- 抉择: 自建 I18nProvider + useI18n hook，字典文件 zh.ts/en.ts
+- 理由: 简单直接，零依赖，体积极轻（en 动态 import 仅 ~1.8KB）
+- 影响: t() 函数通过点号路径查找，支持 {key} 模板插值；en 字典通过动态 import 加载实现代码分割
+
+### [Safari 兼容] overflow:hidden + transform 裁剪失效
+
+**clip-path 替代 overflow:hidden**
+- 背景: iOS Safari 上 `overflow:hidden` 父元素无法正确裁剪应用了 CSS `transform: translateX()` 的子元素（swipe 动画）
+- 抉择: 将 DownloadItem 的 `overflow-hidden` 替换为 `clip-path: inset(0 round 12px)`
+- 理由: clip-path 在 Safari 上能正确作用于 GPU 合成层，且同 overflow:hidden 一样将子元素限制在父边界内
+- 影响: 需要精确匹配 border-radius（rounded-xl = 12px）；全局附加 `html, body, #root { overflow-x: hidden }` 兜底
+
+### [CI/CD] 单 Job 构建部署
+
+**合并 build + deploy 为单 job**
+- 背景: 多 job 时代码构建（centralus）成功，但部署 job 的 runner 区域（northcentralus）无法从 codeload.github.com 下载 actions/deploy-pages@v4
+- 抉择: 删除独立 deploy job，全部放在同一 job 中顺序执行 checkout → build → upload-pages-artifact → deploy-pages
+- 理由: build job 的区域能正常下载所有 action，同一 job 避免切换 runner
+- 影响: permissions 需要 pages: write + id-token: write；Pages source 需设为 "GitHub Actions"

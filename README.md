@@ -6,7 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](.github/CONTRIBUTING.md)
-[![GitHub Pages](https://img.shields.io/badge/deploy-GitHub%20Pages-222?logo=github)](https://your-username.github.io/AriaDash-web)
+[![GitHub Pages](https://img.shields.io/badge/deploy-GitHub%20Pages-222?logo=github)](https://ace0ge.github.io/AriaDash-web)
 [![iOS](https://img.shields.io/badge/iOS-PWA-000?logo=apple)](https://developer.apple.com)
 
 </div>
@@ -21,7 +21,8 @@
 - 🌐 **多协议支持** — HTTP / HTTPS / Magnet / Torrent
 - 🔒 **隐私优先** — 直连你的 aria2 服务，数据不上传云端
 - 🌙 **深色模式** — 护眼且美观
-- 📊 **速度图表** — 实时速度趋势可视化
+- 🌐 **国际化** — 中英文双语支持
+- 📊 **速度图表** — 实时速度趋势可视化 *(开发中)*
 
 ## Quick Start
 
@@ -31,7 +32,7 @@
 aria2c --enable-rpc --rpc-listen-all --rpc-allow-origin-all --rpc-secret=YOUR_SECRET
 ```
 
-2. 打开 AriaDash: **[https://your-username.github.io/AriaDash-web/](https://your-username.github.io/AriaDash-web/)**
+2. 打开 AriaDash: **[https://ace0ge.github.io/AriaDash-web/](https://ace0ge.github.io/AriaDash-web/)**
 
 3. 输入你的 aria2 RPC 地址、端口和 Secret Token，点击"保存并开始"
 
@@ -44,7 +45,7 @@ aria2c --enable-rpc --rpc-listen-all --rpc-allow-origin-all --rpc-secret=YOUR_SE
 ## Development
 
 ```bash
-git clone https://github.com/your-username/AriaDash-web.git
+git clone https://github.com/ace0ge/AriaDash-web.git
 cd AriaDash-web
 npm install
 npm run dev     # 启动开发服务器
@@ -65,4 +66,4 @@ npm run preview # 预览构建产物
 
 ## License
 
-[MIT](LICENSE) © your-username
+[MIT](LICENSE)
