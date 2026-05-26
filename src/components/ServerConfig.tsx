@@ -14,7 +14,7 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
   const [host, setHost] = useState(config.host)
   const [port, setPort] = useState(String(config.port))
   const [secret, setSecret] = useState(config.secret)
-  const [protocol, setProtocol] = useState<'ws' | 'http'>(config.protocol)
+  const [protocol, setProtocol] = useState(config.protocol)
   const [testStatus, setTestStatus] = useState<TestStatus>('idle')
 
   const handleTest = async () => {
@@ -71,21 +71,26 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-400">协议</label>
-            <div className="flex gap-2">
-              {(['ws', 'http'] as const).map((p) => (
+            <div className="grid grid-cols-2 gap-2">
+              {([{ v: 'ws', l: 'ws://' }, { v: 'wss', l: 'wss://' }, { v: 'http', l: 'http://' }, { v: 'https', l: 'https://' }] as const).map(({ v, l }) => (
                 <button
-                  key={p}
-                  onClick={() => setProtocol(p)}
-                  className={`flex-1 rounded-lg py-2 text-sm font-medium ${
-                    protocol === p
+                  key={v}
+                  onClick={() => setProtocol(v)}
+                  className={`rounded-lg py-2 text-sm font-medium ${
+                    protocol === v
                       ? 'bg-blue-500/20 text-blue-400'
                       : 'bg-slate-800 text-slate-500'
                   }`}
                 >
-                  {p === 'ws' ? 'WebSocket' : 'HTTP'}
+                  {l}
                 </button>
               ))}
             </div>
+            <p className="text-[11px] text-slate-600">
+              {protocol.startsWith('wss') || protocol.startsWith('https')
+                ? '🔒 加密连接（推荐）'
+                : '⚠️ 非加密连接'}
+            </p>
           </div>
         </div>
       </div>

@@ -43,18 +43,20 @@ export interface GlobalStat {
   numStoppedTotal: string
 }
 
+export type Aria2Protocol = 'ws' | 'wss' | 'http' | 'https'
+
 export interface Aria2Config {
   host: string
   port: number
   secret: string
-  protocol: 'ws' | 'http'
+  protocol: Aria2Protocol
 }
 
 export const DEFAULT_CONFIG: Aria2Config = {
   host: '192.168.1.100',
   port: 6800,
   secret: '',
-  protocol: 'ws',
+  protocol: 'wss',
 }
 
 export interface RpcRequest {
