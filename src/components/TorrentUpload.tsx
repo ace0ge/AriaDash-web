@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { Upload, Plus } from 'lucide-react'
 import { useAria2Context } from '../context/Aria2Context'
+import { useI18n } from '../i18n'
 
 interface TorrentUploadProps {
   onClose: () => void
@@ -20,6 +21,7 @@ function readAsBase64(file: File): Promise<string> {
 
 export function TorrentUpload({ onClose }: TorrentUploadProps) {
   const { addTorrent } = useAria2Context()
+  const { t } = useI18n()
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -50,7 +52,7 @@ export function TorrentUpload({ onClose }: TorrentUploadProps) {
           className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-slate-700 py-8"
         >
           <Upload className="h-8 w-8 text-slate-500" />
-          <span className="text-sm text-slate-400">点击选择 .torrent 文件</span>
+          <span className="text-sm text-slate-400">{t('sheet.selectTorrent')}</span>
         </button>
       ) : (
         <div className="flex items-center justify-between rounded-lg bg-slate-800 px-3 py-2">
@@ -59,7 +61,7 @@ export function TorrentUpload({ onClose }: TorrentUploadProps) {
             onClick={() => setFile(null)}
             className="text-sm text-slate-500"
           >
-            更换
+            {t('sheet.change')}
           </button>
         </div>
       )}
@@ -69,7 +71,7 @@ export function TorrentUpload({ onClose }: TorrentUploadProps) {
         className="flex items-center justify-center gap-2 rounded-lg bg-blue-500 py-3 text-sm font-medium text-white active:bg-blue-600 disabled:opacity-50"
       >
         <Plus className="h-4 w-4" />
-        {loading ? '上传中...' : '开始下载'}
+        {loading ? t('sheet.uploading') : t('sheet.startDownload')}
       </button>
     </div>
   )

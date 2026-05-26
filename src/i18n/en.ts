@@ -34,6 +34,12 @@ export const en: Record<string, unknown> = {
     unselected: 'Deselected',
     sources: '{n} sources',
     loading: 'Loading...',
+    applySelection: 'Apply Selection',
+    totalPieces: 'Total Pieces',
+    pieceSize: 'Piece Size',
+    verified: 'Verified',
+    choked: 'Choked',
+    unchoked: 'Unchoked',
   },
   settings: {
     title: 'Server Settings',
@@ -51,6 +57,7 @@ export const en: Record<string, unknown> = {
     uploadLimit: 'Global Upload Limit (B/s)',
     connectionsPerServer: 'Connections per Server',
     continue: 'Continue',
+    encryptedConnection: '🔒 Encrypted Connection',
     version: 'Version',
     testing: 'Testing...',
     testSuccess: 'Connection successful',
@@ -83,4 +90,5 @@ export const en: Record<string, unknown> = {
   error: 'Connection failed',
   modify: 'Modify Settings',
   header: { selected: 'Selected {n}', cancel: 'Cancel' },
+  dashboard: { download: 'Download', upload: 'Upload', active: 'Active' },
 }

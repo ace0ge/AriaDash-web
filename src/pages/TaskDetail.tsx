@@ -226,7 +226,7 @@ export function TaskDetail() {
             className="mt-3 flex items-center gap-1.5 rounded-lg bg-blue-500/20 px-3 py-1.5 text-xs font-medium text-blue-400"
           >
             <CheckSquare className="h-3.5 w-3.5" />
-            应用文件选择
+            {t('detail.applySelection')}
           </button>
         )}
       </CollapsibleSection>
@@ -236,10 +236,10 @@ export function TaskDetail() {
           <p className="text-sm text-slate-500">{t('detail.loading')}</p>
         ) : current.numPieces ? (
           <div className="mb-3 space-y-1 text-sm">
-            <DetailRow label="总区块" value={current.numPieces} />
-            <DetailRow label="区块大小" value={formatSize(Number(current.pieceLength ?? '0'))} />
+            <DetailRow label={t('detail.totalPieces')} value={current.numPieces} />
+            <DetailRow label={t('detail.pieceSize')} value={formatSize(Number(current.pieceLength ?? '0'))} />
             {current.verifiedLength && Number(current.verifiedLength) > 0 && (
-              <DetailRow label="已验证" value={formatSize(Number(current.verifiedLength))} />
+              <DetailRow label={t('detail.verified')} value={formatSize(Number(current.verifiedLength))} />
             )}
           </div>
         ) : null}
@@ -258,7 +258,7 @@ export function TaskDetail() {
                   <div className="mt-1 flex gap-4 text-slate-500">
                     <span>↓{formatSpeed(p.downloadSpeed)}</span>
                     <span>↑{formatSpeed(p.uploadSpeed)}</span>
-                    <span>{p.amChoking === 'true' ? '阻塞' : '通畅'}</span>
+                    <span>{p.amChoking === 'true' ? t('detail.choked') : t('detail.unchoked')}</span>
                   </div>
                 </div>
               ))}

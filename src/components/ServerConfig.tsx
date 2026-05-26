@@ -88,7 +88,7 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
                 </button>
               ))}
             </div>
-            <p className="text-[11px] text-slate-500">🔒 加密连接</p>
+            <p className="text-[11px] text-slate-500">{t('settings.encryptedConnection')}</p>
           </div>
         </div>
       </div>

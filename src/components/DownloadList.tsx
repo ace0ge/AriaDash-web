@@ -147,7 +147,7 @@ export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: Downl
         <button
           onClick={onAddClick}
           className="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg shadow-blue-500/30 active:bg-blue-600"
-          aria-label="新建下载"
+          aria-label={t('sheet.title')}
         >
           <Plus className="h-6 w-6" />
         </button>

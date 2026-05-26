@@ -34,6 +34,12 @@ export const zh = {
     unselected: '未选',
     sources: '{n} 个源',
     loading: '加载中...',
+    applySelection: '应用文件选择',
+    totalPieces: '总区块',
+    pieceSize: '区块大小',
+    verified: '已验证',
+    choked: '阻塞',
+    unchoked: '通畅',
   },
   settings: {
     title: '服务器设置',
@@ -51,6 +57,7 @@ export const zh = {
     uploadLimit: '全局上传限速 (B/s)',
     connectionsPerServer: '单服务器连接数',
     continue: '续传',
+    encryptedConnection: '🔒 加密连接',
     version: '版本信息',
     testing: '测试中...',
     testSuccess: '连接成功',
@@ -83,4 +90,5 @@ export const zh = {
   error: '连接失败',
   modify: '修改设置',
   header: { selected: '已选 {n}', cancel: '取消' },
+  dashboard: { download: '下载', upload: '上传', active: '活跃' },
 }
