@@ -5,3 +5,5 @@ dist
 .DS_Store
 *.tsbuildinfo
 AGENTS.md
+docs/PRD.md
+docs/DECISIONS.md

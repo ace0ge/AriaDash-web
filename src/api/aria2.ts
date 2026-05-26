@@ -1,4 +1,4 @@
-import type { Aria2Config, DownloadTask, GlobalStat, RpcNotification, RpcResponse } from './types'
+import type { Aria2Config, DownloadTask, GlobalStat, PeerInfo, RpcNotification, RpcResponse, ServerInfo } from './types'
 
 type PendingEntry = {
   resolve: (value: unknown) => void
@@ -177,5 +177,13 @@ export class Aria2Client {
 
   removeDownloadResult(gid: string): Promise<string> {
     return this.call<string>('aria2.removeDownloadResult', gid)
+  }
+
+  getPeers(gid: string): Promise<PeerInfo[]> {
+    return this.call<PeerInfo[]>('aria2.getPeers', gid)
+  }
+
+  getServers(gid: string): Promise<ServerInfo[]> {
+    return this.call<ServerInfo[]>('aria2.getServers', gid)
   }
 }

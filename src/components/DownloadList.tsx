@@ -53,7 +53,7 @@ export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: Downl
   const hasPaused = [...selected].some((gid) => tasks.find((t) => t.gid === gid)?.status === 'paused')
 
   return (
-    <div className="flex flex-1 flex-col pb-24">
+    <div className="flex flex-1 flex-col overflow-hidden">
       <div className="flex gap-1 overflow-x-auto px-2 pb-2 scrollbar-none">
         {TABS.map((tab) => (
           <button
@@ -69,22 +69,24 @@ export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: Downl
           </button>
         ))}
       </div>
-      <div className="flex flex-col gap-2 px-2">
-        {filtered.map((task) => (
-          <DownloadItem
-            key={task.gid}
-            task={task}
-            batchMode={batchMode}
-            selected={selected.has(task.gid)}
-            onSelect={handleSelect}
-            onPause={pause}
-            onUnpause={unpause}
-            onRemove={remove}
-          />
-        ))}
-        {filtered.length === 0 && (
-          <p className="py-8 text-center text-sm text-slate-600">暂无任务</p>
-        )}
+      <div className="flex-1 overflow-y-auto px-2 pb-24">
+        <div className="flex flex-col gap-2">
+          {filtered.map((task) => (
+            <DownloadItem
+              key={task.gid}
+              task={task}
+              batchMode={batchMode}
+              selected={selected.has(task.gid)}
+              onSelect={handleSelect}
+              onPause={pause}
+              onUnpause={unpause}
+              onRemove={remove}
+            />
+          ))}
+          {filtered.length === 0 && (
+            <p className="py-8 text-center text-sm text-slate-600">暂无任务</p>
+          )}
+        </div>
       </div>
       {batchMode && (
         <BatchActionBar

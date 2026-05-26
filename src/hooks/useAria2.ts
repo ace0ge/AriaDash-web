@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Aria2Client } from '../api/aria2'
-import type { Aria2Config, DownloadTask, GlobalStat, RpcNotification } from '../api/types'
+import type { Aria2Config, DownloadTask, GlobalStat, PeerInfo, RpcNotification, ServerInfo } from '../api/types'
 
 export function useAria2(config: Aria2Config) {
   const clientRef = useRef<Aria2Client | null>(null)
@@ -113,6 +113,24 @@ export function useAria2(config: Aria2Config) {
     await fetchAll(client)
   }, [fetchAll])
 
+  const getTaskDetail = useCallback(async (gid: string): Promise<DownloadTask | null> => {
+    const client = clientRef.current
+    if (!client) return null
+    try { return await client.tellStatus(gid) } catch { return null }
+  }, [])
+
+  const getPeers = useCallback(async (gid: string): Promise<PeerInfo[]> => {
+    const client = clientRef.current
+    if (!client) return []
+    try { return await client.getPeers(gid) } catch { return [] }
+  }, [])
+
+  const getServers = useCallback(async (gid: string): Promise<ServerInfo[]> => {
+    const client = clientRef.current
+    if (!client) return []
+    try { return await client.getServers(gid) } catch { return [] }
+  }, [])
+
   return {
     connected,
     connecting,
@@ -126,5 +144,8 @@ export function useAria2(config: Aria2Config) {
     batchPause,
     batchUnpause,
     batchRemove,
+    getTaskDetail,
+    getPeers,
+    getServers,
   }
 }

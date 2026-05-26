@@ -1,5 +1,5 @@
 import { createContext, useContext, type ReactNode } from 'react'
-import type { Aria2Config, DownloadTask, GlobalStat } from '../api/types'
+import type { Aria2Config, DownloadTask, GlobalStat, PeerInfo, ServerInfo } from '../api/types'
 import { useConfig } from '../hooks/useConfig'
 import { useAria2 } from '../hooks/useAria2'
 
@@ -18,6 +18,9 @@ interface Aria2ContextValue {
   batchPause: (gids: string[]) => Promise<void>
   batchUnpause: (gids: string[]) => Promise<void>
   batchRemove: (gids: string[], force?: boolean) => Promise<void>
+  getTaskDetail: (gid: string) => Promise<DownloadTask | null>
+  getPeers: (gid: string) => Promise<PeerInfo[]>
+  getServers: (gid: string) => Promise<ServerInfo[]>
 }
 
 const Aria2Context = createContext<Aria2ContextValue | null>(null)

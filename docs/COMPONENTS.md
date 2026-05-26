@@ -21,8 +21,11 @@
         │   │                   └─ <BatchActionBar />  ← 底部批量操作栏 (多选模式)
         │   │
         │   ├─ Route "/task/:gid" → <TaskDetail />  ← 任务详情页
-        │   │                       ├─ 详情信息 (文件大小/速度/ETA/连接数)
+        │   │                       ├─ 详情信息 (文件大小/速度/ETA)
         │   │                       ├─ <TaskActions /> ← 操作按钮 (仅详情页)
+        │   │                       ├─ <CollapsibleSection /> ← 连接状态 (WebSocket+任务连接数)
+        │   │                       ├─ <CollapsibleSection /> ← 文件列表 (每文件进度条+源数)
+        │   │                       ├─ <CollapsibleSection /> ← 区块信息 (Peer/Server列表)
         │   │                       └─ (右滑返回: useSwipe edgeOnly)
         │   │
         │   └─ Route "/settings" → <Settings />    ← 设置页
@@ -45,7 +48,7 @@
 | 组件 | 路径 | 职责 | Props |
 |------|------|------|-------|
 | `Home` | `src/pages/Home.tsx` | 组合 Dashboard + DownloadList | 无（从 Context 读取） |
-| `TaskDetail` | `src/pages/TaskDetail.tsx` | 单任务详情 + 操作按钮 + 右滑返回 | 无（从 URL param 取 gid） |
+| `TaskDetail` | `src/pages/TaskDetail.tsx` | 单任务详情 + 操作按钮 + 右滑返回 + 三个 CollapsibleSection (连接状态/文件列表/区块信息) | 无（从 URL param 取 gid） |
 | `Settings` | `src/pages/Settings.tsx` | 组合 ServerConfig + 主题/关于 | 无 |
 
 ### 2.2 布局组件
@@ -72,6 +75,7 @@
 | `TorrentUpload` | `src/components/TorrentUpload.tsx` | 种子文件选择 + 上传 | `{ onSubmit: (file: File, opts) => void }` |
 | `ServerConfig` | `src/components/ServerConfig.tsx` | RPC 配置输入 + 连接测试 | 无（读写 useConfig + useAria2） |
 | `SpeedChart` | `src/components/SpeedChart.tsx` | 速度折线图 | `{ data: SpeedPoint[] }` |
+| `CollapsibleSection` | `src/components/CollapsibleSection.tsx` | 可折叠区块（点击标题展开/收起，grid 动画） | `{ title, icon, children, defaultOpen? }` |
 
 ## 3. 数据流向
 
@@ -98,7 +102,17 @@ useConfig ───> Aria2Provider ───> useAria2 ───> Aria2Client
           batchRemove()                      │
 ```
 
-### 2.4 Hooks
+### 2.4 Context 新增方法
+
+在 `Aria2ContextValue` 中新增：
+
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `getTaskDetail` | `gid: string` | `Promise<DownloadTask \| null>` | 获取单个任务最新详情（`aria2.tellStatus`） |
+| `getPeers` | `gid: string` | `Promise<PeerInfo[]>` | 获取 BT 任务对等节点列表（`aria2.getPeers`） |
+| `getServers` | `gid: string` | `Promise<ServerInfo[]>` | 获取 HTTP/FTP 任务服务器列表（`aria2.getServers`） |
+
+### 2.5 Hooks
 
 | Hook | 路径 | 职责 | 返回值 |
 |------|------|------|--------|

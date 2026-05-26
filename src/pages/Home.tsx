@@ -48,7 +48,7 @@ export function Home() {
   }
 
   return (
-    <>
+    <div className="flex flex-1 flex-col overflow-hidden">
       <Header
         batchMode={batchMode}
         selectedCount={selectedCount}
@@ -61,6 +61,6 @@ export function Home() {
         onAddClick={() => setSheetOpen(true)}
       />
       <AddDownloadSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
-    </>
+    </div>
   )
 }

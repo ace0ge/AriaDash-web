@@ -18,6 +18,25 @@ export interface DownloadTask {
   seeder?: 'true' | 'false'
   verifiedLength?: string
   verifyIntegrityPending?: string
+  numPieces?: string
+  pieceLength?: string
+}
+
+export interface PeerInfo {
+  peerId: string
+  ip: string
+  port: string
+  bitfield: string
+  amChoking: 'true' | 'false'
+  peerChoking: 'true' | 'false'
+  downloadSpeed: string
+  uploadSpeed: string
+  seeder: 'true' | 'false'
+}
+
+export interface ServerInfo {
+  index: string
+  servers: { uri: string; currentUri: string; downloadSpeed: string }[]
 }
 
 export interface FileInfo {
