@@ -1,5 +1,5 @@
 import { createContext, useContext, type ReactNode } from 'react'
-import type { Aria2Config, DownloadTask, GlobalStat, PeerInfo, ServerInfo } from '../api/types'
+import type { Aria2Config, DownloadTask, GlobalOption, GlobalStat, PeerInfo, ServerInfo, VersionInfo } from '../api/types'
 import { useConfig } from '../hooks/useConfig'
 import { useAria2 } from '../hooks/useAria2'
 
@@ -21,6 +21,13 @@ interface Aria2ContextValue {
   getTaskDetail: (gid: string) => Promise<DownloadTask | null>
   getPeers: (gid: string) => Promise<PeerInfo[]>
   getServers: (gid: string) => Promise<ServerInfo[]>
+  getGlobalOption: () => Promise<GlobalOption | null>
+  changeGlobalOption: (options: Record<string, string>) => Promise<void>
+  addTorrent: (base64: string, options?: Record<string, unknown>) => Promise<void>
+  changeTaskOption: (gid: string, options: Record<string, string>) => Promise<void>
+  moveTask: (gid: string, pos: number, how: string) => Promise<void>
+  purgeDownloadResult: () => Promise<void>
+  getVersion: () => Promise<VersionInfo | null>
 }
 
 const Aria2Context = createContext<Aria2ContextValue | null>(null)

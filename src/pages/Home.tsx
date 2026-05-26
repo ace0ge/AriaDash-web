@@ -5,9 +5,11 @@ import { DownloadList } from '../components/DownloadList'
 import { Header } from '../components/Header'
 import { AddDownloadSheet } from '../components/AddDownloadSheet'
 import { useAria2Context } from '../context/Aria2Context'
+import { useI18n } from '../i18n'
 
 export function Home() {
   const { config, globalStat, connecting, error } = useAria2Context()
+  const { t } = useI18n()
   const [batchMode, setBatchMode] = useState(false)
   const [selectedCount, setSelectedCount] = useState(0)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -18,13 +20,13 @@ export function Home() {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
         <ArrowDownToLine className="h-12 w-12 text-slate-700" />
-        <h2 className="text-lg font-semibold text-white">欢迎使用 AriaDash</h2>
-        <p className="text-center text-sm text-slate-500">配置你的 aria2 服务器连接，开始远程管理下载任务</p>
+        <h2 className="text-lg font-semibold text-white">{t('welcome.title')}</h2>
+        <p className="text-center text-sm text-slate-500">{t('welcome.desc')}</p>
         <a
           href="#/settings"
           className="rounded-lg bg-blue-500 px-6 py-2.5 text-sm font-medium text-white"
         >
-          开始配置
+          {t('welcome.cta')}
         </a>
       </div>
     )
@@ -33,7 +35,7 @@ export function Home() {
   if (connecting) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center p-4">
-        <p className="text-sm text-slate-400">正在连接...</p>
+        <p className="text-sm text-slate-400">{t('connecting')}</p>
       </div>
     )
   }
@@ -42,7 +44,7 @@ export function Home() {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4">
         <p className="text-sm text-red-400">{error}</p>
-        <a href="#/settings" className="text-sm text-blue-400">修改设置</a>
+        <a href="#/settings" className="text-sm text-blue-400">{t('modify')}</a>
       </div>
     )
   }

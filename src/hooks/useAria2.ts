@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Aria2Client } from '../api/aria2'
-import type { Aria2Config, DownloadTask, GlobalStat, PeerInfo, RpcNotification, ServerInfo } from '../api/types'
+import type { Aria2Config, DownloadTask, GlobalOption, GlobalStat, PeerInfo, RpcNotification, ServerInfo, VersionInfo } from '../api/types'
 
 export function useAria2(config: Aria2Config) {
   const clientRef = useRef<Aria2Client | null>(null)
@@ -131,6 +131,51 @@ export function useAria2(config: Aria2Config) {
     try { return await client.getServers(gid) } catch { return [] }
   }, [])
 
+  const getGlobalOption = useCallback(async (): Promise<GlobalOption | null> => {
+    const client = clientRef.current
+    if (!client) return null
+    try { return await client.getGlobalOption() } catch { return null }
+  }, [])
+
+  const changeGlobalOption = useCallback(async (options: Record<string, string>): Promise<void> => {
+    const client = clientRef.current
+    if (!client) return
+    try { await client.changeGlobalOption(options) } catch {}
+  }, [])
+
+  const addTorrent = useCallback(async (base64: string, options?: Record<string, unknown>): Promise<void> => {
+    const client = clientRef.current
+    if (!client) return
+    try { await client.addTorrent(base64, [], options) } catch {}
+    await fetchAll(client)
+  }, [fetchAll])
+
+  const changeTaskOption = useCallback(async (gid: string, options: Record<string, string>): Promise<void> => {
+    const client = clientRef.current
+    if (!client) return
+    try { await client.changeOption(gid, options) } catch {}
+  }, [])
+
+  const moveTask = useCallback(async (gid: string, pos: number, how: string): Promise<void> => {
+    const client = clientRef.current
+    if (!client) return
+    try { await client.changePosition(gid, pos, how) } catch {}
+    await fetchAll(client)
+  }, [fetchAll])
+
+  const purgeDownloadResult = useCallback(async (): Promise<void> => {
+    const client = clientRef.current
+    if (!client) return
+    try { await client.purgeDownloadResult() } catch {}
+    await fetchAll(client)
+  }, [fetchAll])
+
+  const getVersion = useCallback(async (): Promise<VersionInfo | null> => {
+    const client = clientRef.current
+    if (!client) return null
+    try { return await client.getVersion() } catch { return null }
+  }, [])
+
   return {
     connected,
     connecting,
@@ -147,5 +192,12 @@ export function useAria2(config: Aria2Config) {
     getTaskDetail,
     getPeers,
     getServers,
+    getGlobalOption,
+    changeGlobalOption,
+    addTorrent,
+    changeTaskOption,
+    moveTask,
+    purgeDownloadResult,
+    getVersion,
   }
 }

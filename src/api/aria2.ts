@@ -1,4 +1,4 @@
-import type { Aria2Config, DownloadTask, GlobalStat, PeerInfo, RpcNotification, RpcResponse, ServerInfo } from './types'
+import type { Aria2Config, DownloadTask, GlobalOption, GlobalStat, PeerInfo, RpcNotification, RpcResponse, ServerInfo, VersionInfo } from './types'
 
 type PendingEntry = {
   resolve: (value: unknown) => void
@@ -185,5 +185,33 @@ export class Aria2Client {
 
   getServers(gid: string): Promise<ServerInfo[]> {
     return this.call<ServerInfo[]>('aria2.getServers', gid)
+  }
+
+  getGlobalOption(): Promise<GlobalOption> {
+    return this.call<GlobalOption>('aria2.getGlobalOption')
+  }
+
+  changeGlobalOption(options: Record<string, string>): Promise<string> {
+    return this.call<string>('aria2.changeGlobalOption', options)
+  }
+
+  addTorrent(torrentBase64: string, uris?: string[], options?: Record<string, unknown>): Promise<string> {
+    return this.call<string>('aria2.addTorrent', torrentBase64, uris ?? [], options ?? {})
+  }
+
+  changeOption(gid: string, options: Record<string, string>): Promise<string> {
+    return this.call<string>('aria2.changeOption', gid, options)
+  }
+
+  changePosition(gid: string, pos: number, how: string): Promise<number> {
+    return this.call<number>('aria2.changePosition', gid, pos, how)
+  }
+
+  purgeDownloadResult(): Promise<string> {
+    return this.call<string>('aria2.purgeDownloadResult')
+  }
+
+  getVersion(): Promise<VersionInfo> {
+    return this.call<VersionInfo>('aria2.getVersion')
   }
 }

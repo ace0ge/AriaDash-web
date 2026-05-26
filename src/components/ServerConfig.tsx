@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Wifi, WifiOff, Loader2 } from 'lucide-react'
 import type { Aria2Config } from '../api/types'
 import { Aria2Client } from '../api/aria2'
+import { useI18n } from '../i18n'
 
 interface ServerConfigProps {
   config: Aria2Config
@@ -11,6 +12,7 @@ interface ServerConfigProps {
 type TestStatus = 'idle' | 'testing' | 'success' | 'error'
 
 export function ServerConfig({ config, onSave }: ServerConfigProps) {
+  const { t } = useI18n()
   const [host, setHost] = useState(config.host)
   const [port, setPort] = useState(String(config.port))
   const [secret, setSecret] = useState(config.secret)
@@ -41,7 +43,7 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
       <div className="rounded-xl bg-slate-900 p-4">
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">服务器地址</label>
+            <label className="mb-1 block text-xs font-medium text-slate-400">{t('settings.address')}</label>
             <input
               value={host}
               onChange={(e) => setHost(e.target.value)}
@@ -50,7 +52,7 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">端口</label>
+            <label className="mb-1 block text-xs font-medium text-slate-400">{t('settings.port')}</label>
             <input
               value={port}
               onChange={(e) => setPort(e.target.value)}
@@ -60,7 +62,7 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">Secret Token</label>
+            <label className="mb-1 block text-xs font-medium text-slate-400">{t('settings.secret')}</label>
             <input
               value={secret}
               onChange={(e) => setSecret(e.target.value)}
@@ -70,7 +72,7 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">协议</label>
+            <label className="mb-1 block text-xs font-medium text-slate-400">{t('settings.protocol')}</label>
             <div className="grid grid-cols-2 gap-2">
               {([{ v: 'wss', l: 'wss://' }, { v: 'https', l: 'https://' }] as const).map(({ v, l }) => (
                 <button
@@ -103,21 +105,21 @@ export function ServerConfig({ config, onSave }: ServerConfigProps) {
         ) : testStatus === 'error' ? (
           <WifiOff className="h-4 w-4 text-red-400" />
         ) : null}
-        测试连接
+        {testStatus === 'testing' ? t('settings.testing') : t('settings.test')}
       </button>
 
       {testStatus === 'success' && (
-        <p className="text-center text-xs text-green-400">连接成功</p>
+        <p className="text-center text-xs text-green-400">{t('settings.testSuccess')}</p>
       )}
       {testStatus === 'error' && (
-        <p className="text-center text-xs text-red-400">连接失败，请检查地址和端口</p>
+        <p className="text-center text-xs text-red-400">{t('settings.testFail')}</p>
       )}
 
       <button
         onClick={handleSave}
         className="rounded-lg bg-blue-500 py-3 text-sm font-medium text-white active:bg-blue-600"
       >
-        保存并开始
+        {t('settings.save')}
       </button>
     </div>
   )

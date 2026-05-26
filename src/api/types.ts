@@ -78,6 +78,20 @@ export const DEFAULT_CONFIG: Aria2Config = {
   protocol: 'wss',
 }
 
+export interface GlobalOption {
+  'max-concurrent-downloads': string
+  'max-overall-download-limit': string
+  'max-overall-upload-limit': string
+  'max-connection-per-server': string
+  continue: 'true' | 'false'
+  [key: string]: string
+}
+
+export interface VersionInfo {
+  version: string
+  enabledFeatures: string[]
+}
+
 export interface RpcRequest {
   jsonrpc: '2.0'
   id: string

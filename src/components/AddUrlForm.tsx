@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { useI18n } from '../i18n'
 
 interface AddUrlFormProps {
   onSubmit: (uri: string) => void
 }
 
 export function AddUrlForm({ onSubmit }: AddUrlFormProps) {
+  const { t } = useI18n()
   const [uri, setUri] = useState('')
 
   const handleSubmit = () => {
@@ -20,7 +22,7 @@ export function AddUrlForm({ onSubmit }: AddUrlFormProps) {
       <input
         value={uri}
         onChange={(e) => setUri(e.target.value)}
-        placeholder="输入下载链接"
+        placeholder={t('sheet.urlPlaceholder')}
         className="w-full rounded-lg bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-600 outline-none focus:ring-2 focus:ring-blue-500/50"
       />
       <button
@@ -29,7 +31,7 @@ export function AddUrlForm({ onSubmit }: AddUrlFormProps) {
         className="flex items-center justify-center gap-2 rounded-lg bg-blue-500 py-3 text-sm font-medium text-white active:bg-blue-600 disabled:opacity-50"
       >
         <Plus className="h-4 w-4" />
-        开始下载
+        {t('sheet.startDownload')}
       </button>
     </div>
   )

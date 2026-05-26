@@ -2,7 +2,9 @@ import { useState, useMemo, useEffect } from 'react'
 import { DownloadItem } from './DownloadItem'
 import { BatchActionBar } from './BatchActionBar'
 import { useAria2Context } from '../context/Aria2Context'
-import { Plus } from 'lucide-react'
+import { useI18n } from '../i18n'
+import { Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
+import type { DownloadTask } from '../api/types'
 
 type FilterTab = 'all' | 'active' | 'waiting' | 'paused' | 'complete' | 'error'
 
@@ -15,6 +17,15 @@ const TABS: { key: FilterTab; label: string }[] = [
   { key: 'error', label: '错误' },
 ]
 
+const TAB_KEYS: Record<FilterTab, string> = {
+  all: 'status.all',
+  active: 'status.active',
+  waiting: 'status.waiting',
+  paused: 'status.paused',
+  complete: 'status.complete',
+  error: 'status.error',
+}
+
 interface DownloadListProps {
   batchMode: boolean
   onBatchModeChange: (batchMode: boolean, count: number) => void
@@ -22,13 +33,14 @@ interface DownloadListProps {
 }
 
 export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: DownloadListProps) {
-  const { tasks, pause, unpause, remove, batchPause, batchUnpause, batchRemove } = useAria2Context()
+  const { tasks, pause, unpause, remove, batchPause, batchUnpause, batchRemove, moveTask, purgeDownloadResult } = useAria2Context()
+  const { t } = useI18n()
   const [filterTab, setFilterTab] = useState<FilterTab>('all')
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
   const filtered = useMemo(() => {
     if (filterTab === 'all') return tasks
-    return tasks.filter((t) => t.status === filterTab)
+    return tasks.filter((task) => task.status === filterTab)
   }, [tasks, filterTab])
 
   useEffect(() => {
@@ -49,8 +61,12 @@ export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: Downl
     onBatchModeChange(false, 0)
   }
 
-  const hasActive = [...selected].some((gid) => tasks.find((t) => t.gid === gid)?.status === 'active')
-  const hasPaused = [...selected].some((gid) => tasks.find((t) => t.gid === gid)?.status === 'paused')
+  const hasActive = [...selected].some((gid) => tasks.find((task) => task.gid === gid)?.status === 'active')
+  const hasPaused = [...selected].some((gid) => tasks.find((task) => task.gid === gid)?.status === 'paused')
+
+  const handleMove = (task: DownloadTask, dir: -1 | 1) => {
+    moveTask(task.gid, dir, 'POS_CUR')
+  }
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -65,26 +81,55 @@ export function DownloadList({ batchMode, onBatchModeChange, onAddClick }: Downl
                 : 'text-slate-500 hover:text-slate-300'
             }`}
           >
-            {tab.label}
+            {t(TAB_KEYS[tab.key])}
           </button>
         ))}
+        {filterTab === 'complete' && (
+          <button
+            onClick={() => { purgeDownloadResult(); setFilterTab('all') }}
+            className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1 text-xs font-medium text-red-400"
+          >
+            <Trash2 className="h-3 w-3" />
+            {t('batch.purge')}
+          </button>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto px-2 pb-24">
         <div className="flex flex-col gap-2">
-          {filtered.map((task) => (
-            <DownloadItem
-              key={task.gid}
-              task={task}
-              batchMode={batchMode}
-              selected={selected.has(task.gid)}
-              onSelect={handleSelect}
-              onPause={pause}
-              onUnpause={unpause}
-              onRemove={remove}
-            />
+          {filtered.map((task, idx) => (
+            <div key={task.gid} className="flex items-start gap-1">
+              {filterTab === 'waiting' && (
+                <div className="flex flex-col gap-0.5 pt-3">
+                  <button
+                    onClick={() => handleMove(task, -1)}
+                    className="rounded p-0.5 text-slate-600 hover:text-slate-400"
+                  >
+                    <ArrowUp className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleMove(task, 1)}
+                    disabled={idx === filtered.length - 1}
+                    className="rounded p-0.5 text-slate-600 hover:text-slate-400 disabled:opacity-30"
+                  >
+                    <ArrowDown className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+              <div className="flex-1">
+                <DownloadItem
+                  task={task}
+                  batchMode={batchMode}
+                  selected={selected.has(task.gid)}
+                  onSelect={handleSelect}
+                  onPause={pause}
+                  onUnpause={unpause}
+                  onRemove={remove}
+                />
+              </div>
+            </div>
           ))}
           {filtered.length === 0 && (
-            <p className="py-8 text-center text-sm text-slate-600">暂无任务</p>
+            <p className="py-8 text-center text-sm text-slate-600">{t('task.empty')}</p>
           )}
         </div>
       </div>

@@ -4,6 +4,7 @@ import type { DownloadTask } from '../api/types'
 import { ProgressBar } from './ProgressBar'
 import { StatusBadge } from './StatusBadge'
 import { useSwipe } from '../hooks/useSwipe'
+import { useI18n } from '../i18n'
 
 interface DownloadItemProps {
   task: DownloadTask
@@ -43,16 +44,6 @@ function percent(task: DownloadTask): number {
   return (Number(task.completedLength) / total) * 100
 }
 
-function eta(task: DownloadTask): string {
-  const remaining = Number(task.totalLength) - Number(task.completedLength)
-  const speed = Number(task.downloadSpeed)
-  if (speed <= 0) return '--'
-  const secs = Math.ceil(remaining / speed)
-  if (secs < 60) return `${secs}秒`
-  if (secs < 3600) return `${Math.ceil(secs / 60)}分钟`
-  return `${Math.floor(secs / 3600)}小时${Math.ceil((secs % 3600) / 60)}分`
-}
-
 export function DownloadItem({
   task,
   batchMode,
@@ -62,9 +53,20 @@ export function DownloadItem({
   onUnpause,
   onRemove,
 }: DownloadItemProps) {
+  const { t } = useI18n()
   const navigate = useNavigate()
   const pct = percent(task)
   const name = fileName(task)
+
+  function etaStr(task: DownloadTask): string {
+    const remaining = Number(task.totalLength) - Number(task.completedLength)
+    const speed = Number(task.downloadSpeed)
+    if (speed <= 0) return t('task.eta.unknown')
+    const secs = Math.ceil(remaining / speed)
+    if (secs < 60) return t('task.eta.seconds', { n: secs })
+    if (secs < 3600) return t('task.eta.minutes', { n: Math.ceil(secs / 60) })
+    return t('task.eta.hours', { h: Math.floor(secs / 3600), m: Math.ceil((secs % 3600) / 60) })
+  }
 
   const { translateX, isSwiping, revealed, handlers, closeReveal } = useSwipe({
     threshold: 80,
@@ -132,7 +134,7 @@ export function DownloadItem({
               {task.status === 'active' || task.status === 'paused' ? (
                 <>
                   <span>{formatSpeed(task.downloadSpeed)}</span>
-                  <span>ETA {eta(task)}</span>
+                  <span>ETA {etaStr(task)}</span>
                 </>
               ) : (
                 <span>{formatSize(Number(task.totalLength))}</span>
