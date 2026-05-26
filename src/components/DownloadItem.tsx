@@ -66,42 +66,47 @@ export function DownloadItem({
   const pct = percent(task)
   const name = fileName(task)
 
-  const { translateX, isSwiping, handlers } = useSwipe({
+  const { translateX, isSwiping, revealed, handlers, closeReveal } = useSwipe({
     threshold: 80,
-    onClick: batchMode ? () => onSelect(task.gid) : () => navigate(`/task/${task.gid}`),
-    onSwipeLeft: () => {
-      if (batchMode) return
-      if (task.status === 'paused') onUnpause(task.gid)
-      else if (task.status === 'active') onPause(task.gid)
-    },
-    onSwipeRight: () => {
-      if (batchMode) return
-      onRemove(task.gid)
-    },
+    onClick: () => navigate(`/task/${task.gid}`),
   })
+
+  const showLeftAction = revealed === 'right'
+  const showRightAction = revealed === 'left'
 
   return (
     <div className="relative overflow-hidden rounded-xl">
+      {!batchMode && (
+        <button
+          onClick={() => { onRemove(task.gid); closeReveal() }}
+          className="absolute inset-y-0 left-0 flex w-20 items-center justify-center rounded-xl bg-red-500/20"
+          style={{ zIndex: showLeftAction ? 1 : 0, pointerEvents: showLeftAction ? 'auto' : 'none' }}
+        >
+          <Trash2 className="h-5 w-5 text-red-400" />
+        </button>
+      )}
+      {!batchMode && task.status !== 'complete' && task.status !== 'removed' && task.status !== 'error' && (
+        <button
+          onClick={() => {
+            if (task.status === 'paused') onUnpause(task.gid)
+            else onPause(task.gid)
+            closeReveal()
+          }}
+          className="absolute inset-y-0 right-0 flex w-20 items-center justify-center rounded-xl bg-blue-500/20"
+          style={{ zIndex: showRightAction ? 1 : 0, pointerEvents: showRightAction ? 'auto' : 'none' }}
+        >
+          {task.status === 'paused' ? (
+            <Play className="h-5 w-5 text-blue-400" />
+          ) : (
+            <Pause className="h-5 w-5 text-blue-400" />
+          )}
+        </button>
+      )}
       <div
-        className="absolute inset-y-0 right-0 flex w-20 items-center justify-center rounded-xl bg-blue-500/20"
-        style={{ opacity: isSwiping && translateX < 0 ? 1 : 0 }}
-      >
-        {task.status === 'paused' ? (
-          <Play className="h-5 w-5 text-blue-400" />
-        ) : (
-          <Pause className="h-5 w-5 text-blue-400" />
-        )}
-      </div>
-      <div
-        className="absolute inset-y-0 left-0 flex w-20 items-center justify-center rounded-xl bg-red-500/20"
-        style={{ opacity: isSwiping && translateX > 0 ? 1 : 0 }}
-      >
-        <Trash2 className="h-5 w-5 text-red-400" />
-      </div>
-      <div
-        className={`relative rounded-xl bg-slate-900 px-3 py-2.5 ${isSwiping ? '' : 'transition-transform duration-300'}`}
-        style={{ transform: `translateX(${batchMode ? 0 : translateX}px)` }}
-        {...handlers}
+        className={`relative rounded-xl bg-slate-900 px-3 py-2.5 select-none ${isSwiping ? '' : 'transition-transform duration-300'}`}
+        style={{ transform: `translateX(${batchMode ? 0 : translateX}px)`, touchAction: 'manipulation' }}
+        {...(batchMode ? {} : handlers)}
+        onClick={batchMode ? () => onSelect(task.gid) : undefined}
       >
         <div className="flex items-start gap-2">
           {batchMode && (

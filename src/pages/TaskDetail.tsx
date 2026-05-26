@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, File, FolderOpen, Link, Wifi } from 'lucide-react'
 import { useAria2Context } from '../context/Aria2Context'
@@ -51,10 +52,17 @@ export function TaskDetail() {
   const { tasks, pause, unpause, remove } = useAria2Context()
   const task = tasks.find((t) => t.gid === gid)
 
-  useSwipe({
+  const { revealed, handlers, closeReveal } = useSwipe({
     edgeOnly: true,
-    onSwipeRight: () => navigate(-1),
+    threshold: 60,
   })
+
+  useEffect(() => {
+    if (revealed === 'right') {
+      closeReveal()
+      navigate(-1)
+    }
+  }, [revealed, closeReveal, navigate])
 
   if (!task) {
     return (
@@ -69,7 +77,7 @@ export function TaskDetail() {
   const name = fileName(task)
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4" {...handlers}>
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1 text-sm text-slate-400"
